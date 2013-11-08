@@ -1,0 +1,54 @@
+<?php
+/**
+ * @file
+ * Code for the Alma search.
+ */
+
+/**
+ * Calls the Alma backend, possibly caching the result.
+ *
+ * @param $method
+ *   The desired method.
+ * @param ...
+ *   Arguments to the method.
+ *
+ * @return mixed
+ *   NULL on error, or the result of the method call.
+ */
+function alma_search_search($query, $start_no = 1, $number_of_records = 10) {
+  $client = alma_search_client();
+
+  try {
+    $result = $client->run_lms_search($query, 'native', $start_no, $number_of_records);
+  }
+  catch (Exception $e) {
+    watchdog('alma', '@method error: “@message”', array('@method' => $method, '@message' => $e->getMessage()), WATCHDOG_ERROR);
+    throw $e;
+  }
+
+  return $result;
+}
+
+
+/**
+ * Return a fully instantiated AlmaClient instance.
+ */
+function alma_search_client() {
+  // This is basically a singleton. We also wait until right before
+  // instantiating to include our required classes. That seems like a
+  // decent performance tradeoff instead of loading everything on every
+  // page load.
+  static $client;
+  if (!isset($client)) {
+    try {
+      $client = new AlmaSearchClient(variable_get('alma_base_url', ''));
+    }
+    catch (Exception $e) {
+      watchdog('alma search', 'Constructor error: “@message”', array('@message' => $e->getMessage(), WATCHDOG_ERROR));
+      return NULL;
+    }
+
+  }
+  return $client;
+}
+

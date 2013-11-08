@@ -1,0 +1,9 @@
+name = Alma Search
+description = Implementation of Axiell’s Alma API Search for DDELibra.
+core = 7.x
+package = Providers
+php = 5.2.4
+version = 7.x-1.0-beta
+project = alma_search
+files[] = lib/AlmaSearchClient/AlmaSearchClient.class.php
+dependencies[] = alma
