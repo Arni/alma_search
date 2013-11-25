@@ -29,6 +29,42 @@ function alma_search_search($query, $start_no = 1, $number_of_records = 10) {
   return $result;
 }
 
+/**
+ * Implements provider availability, holdings.
+ */
+function alma_search_availability_holdings($provider_ids) {
+
+  $client = alma_search_client();
+  try {
+    $details = $client->catalogue_record_detail($provider_ids);
+  } catch (Exception $e) {
+    watchdog('alma', '@method error: “@message”', array('@method' => $method, '@message' => $e->getMessage()), WATCHDOG_ERROR);
+    throw $e;
+  }
+  $result = array();
+
+  if ($details && isset($details['records'])) {
+    foreach ($details['records'] as $alma_id => $record) {
+      $holding = array(
+        'local_id' => $alma_id,
+        'title' => $record['titles'][0],
+        'available' => ($record['available_count'] > 0),
+        'reservable' => $record['show_reservation_button'],
+        'show_reservation_button' => $record['show_reservation_button'],
+        'holdings' => $record['holdings'],
+        'reserved_count' => (int) $record['reservation_count'],
+        'deferred_period' => FALSE,
+        'issues' => FALSE,
+        'is_periodical' => ($record['media_class'] == 'periodical'),
+        'is_internet' => ($record['media_class'] == 'internet'),
+      );
+      $result[$alma_id] = $holding;
+    }
+  }
+  file_put_contents("/home/quickstart/work/debug/debuggenrecron9.txt", print_r($result, TRUE), FILE_APPEND);
+  return $result;
+}
+
 
 /**
  * Return a fully instantiated AlmaClient instance.
