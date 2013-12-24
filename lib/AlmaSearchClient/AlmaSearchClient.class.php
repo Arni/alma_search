@@ -109,7 +109,6 @@ class AlmaSearchClient {
     // the HTTP client out.
     //$url = url($this->base_url . $method, array('query' => $params));
     $request = curl_multi($curl_sessions);
-    file_put_contents("/home/quickstart/work/debug/debuggenremulti2.txt", print_r($request, TRUE), FILE_APPEND);
 
     $stopTime = explode(' ', microtime());
     // For use with a non-Drupal-system, we should have a way to swap
@@ -126,7 +125,7 @@ class AlmaSearchClient {
       watchdog('alma', 'Sent request: @url (@seconds s)', array('@url' => url($this->base_url . $method, array('query' => $params)), '@seconds' => $seconds), WATCHDOG_DEBUG);
     }
 
-    if ($request) {
+    if ($request && is_array($request)) {
       $docs = array();
       foreach ($request as $rec) {
         // Since we currently have no need for the more advanced stuff
@@ -135,7 +134,7 @@ class AlmaSearchClient {
         $doc = new DOMDocument();
         $doc->loadXML($rec);
         if (!$check_status || $doc->getElementsByTagName('status')->item(0)->getAttribute('value') == 'ok') {
-          $docs = $doc;
+          $docs[] = $doc;
         } else {
           $message = $doc->getElementsByTagName('status')->item(0)->getAttribute('key');
           switch ($message) {
@@ -163,7 +162,6 @@ class AlmaSearchClient {
 
     $curl_session['options'] = $curl_options;
     
-   file_put_contents("/home/quickstart/work/debug/debuggenremultcurl1.txt", print_r($curl_session, TRUE), FILE_APPEND);
     return $curl_session;
   }
 
@@ -241,13 +239,9 @@ class AlmaSearchClient {
       );
       $offset += 50;
     }
-    file_put_contents("/home/quickstart/work/debug/debuggenremulti3.txt", print_r($params, TRUE), FILE_APPEND);
-//    $params = array(
-//      'catalogueRecordKey' => $alma_ids,
-//    );
     $docs = $this->multi_request('catalogue/detail', $params, FALSE);
     $data = array(
-      'request_status' => $doc->getElementsByTagName('status')->item(0)->getAttribute('value'),
+      'request_status' => $docs[0]->getElementsByTagName('status')->item(0)->getAttribute('value'),
       'records' => array(),
     );
 
