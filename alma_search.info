@@ -7,3 +7,4 @@ version = 7.x-1.0-beta
 project = alma_search
 files[] = lib/AlmaSearchClient/AlmaSearchClient.class.php
 dependencies[] = alma
+dependencies[] = curl_multi
