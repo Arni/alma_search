@@ -61,7 +61,6 @@ function alma_search_availability_holdings($provider_ids) {
       $result[$alma_id] = $holding;
     }
   }
-  file_put_contents("/home/quickstart/work/debug/debuggenrecron9.txt", print_r($result, TRUE), FILE_APPEND);
   return $result;
 }
 
