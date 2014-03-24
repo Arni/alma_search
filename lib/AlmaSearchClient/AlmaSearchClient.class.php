@@ -124,8 +124,10 @@ class AlmaSearchClient {
       // Log the request
       watchdog('alma', 'Sent request: @url (@seconds s)', array('@url' => url($this->base_url . $method, array('query' => $params)), '@seconds' => $seconds), WATCHDOG_DEBUG);
     }
-
-    if ($request && is_array($request)) {
+    if ($request) {
+      if (!is_array($request)) {
+        $request = array($request);
+      }
       $docs = array();
       foreach ($request as $rec) {
         // Since we currently have no need for the more advanced stuff

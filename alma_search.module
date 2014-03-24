@@ -22,7 +22,7 @@ function alma_search_search($query, $start_no = 1, $number_of_records = 10) {
     $result = $client->run_lms_search($query, 'native', $start_no, $number_of_records);
   }
   catch (Exception $e) {
-    watchdog('alma', '@method error: “@message”', array('@method' => $method, '@message' => $e->getMessage()), WATCHDOG_ERROR);
+    watchdog('alma', '@method error: “@message”', array( '@message' => $e->getMessage()), WATCHDOG_ERROR);
     throw $e;
   }
 
@@ -38,7 +38,7 @@ function alma_search_availability_holdings($provider_ids) {
   try {
     $details = $client->catalogue_record_detail($provider_ids);
   } catch (Exception $e) {
-    watchdog('alma', '@method error: “@message”', array('@method' => $method, '@message' => $e->getMessage()), WATCHDOG_ERROR);
+    watchdog('alma', '@method error: “@message”', array('@message' => $e->getMessage()), WATCHDOG_ERROR);
     throw $e;
   }
   $result = array();
